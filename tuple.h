@@ -20,4 +20,9 @@ tuple tuple_new(int size);
 */
 void tuple_free(tuple t);
 
+/*
+* Converts given tuple into string based on given scheme
+*/
+char* tuple_string(tuple t, enum type scheme[], int len);
+
 #endif

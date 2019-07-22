@@ -8,4 +8,4 @@ data: tuple.o generic.o table.o hash_table.o main.o
 	$(CC) -o $@ $^ -lm
 	
 clean:
-	-del $(PROGRAMS).exe *.o
+	-rm $(PROGRAMS) *.o

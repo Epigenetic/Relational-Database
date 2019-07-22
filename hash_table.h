@@ -18,7 +18,7 @@ struct hash_table{
 	int fill;
 	int element;
 	tuple* data;
-	int (* hash_func)(void*,int);
+	int (* hash_func)(generic,int);
 };
 
 /*

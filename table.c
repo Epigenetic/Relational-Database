@@ -1,6 +1,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "table.h"
 #include "generic.h"
@@ -20,15 +21,17 @@ table table_new(int scheme_size, char* scheme_labels[], enum type scheme_type[],
 		if(is_index[i] != 0)
 			sum++;
 	t->data_size = sum;
-	hash_table data[sum];
+	hash_table* data = malloc(sizeof(hash_table)*sum);
 	int fill = 0;
 	for(int i = 0; i < scheme_size; i++){
 		if(is_index[i] != 0){
 			hash_table ht = hash_table_new(10,i,scheme_type[i]);
 			data[fill++] = ht;
 		}
+		//printf("id: %d\n",data[fill-1]->element);
 	}
 	t->data = data;
+	//printf("attempt %d\n",t->data[0]->element);
 	return t;
 }
 
@@ -38,6 +41,7 @@ table table_new(int scheme_size, char* scheme_labels[], enum type scheme_type[],
 void table_free(table t){
 	for(int i = 0; i < t->data_size; i++)
 		hash_table_free(t->data[i]);
+	free(t->data);
 	free(t);
 }
 
@@ -54,6 +58,7 @@ void table_insert(int num, table t, ...){
 	va_start(args,t);
 	int i = 0;
 	while(i < num){
+		//printf("i: %d\n",i);
 		generic g = generic_new();
 		switch(t->scheme_type[i]){
 			case character:
@@ -73,11 +78,14 @@ void table_insert(int num, table t, ...){
 			break;
 		}
 		tu->data[i] = g;
+		i++;
 	}
-	va_end(args);
 	for(int j = 0; j < t->data_size; j++){
+		//printf("j: %d\n",j);
 		hash_table_insert(tu, t->data[j]);
 	}
+	va_end(args);
+	//printf("to here\n");
 }
 
 /*
@@ -89,12 +97,13 @@ tuple* table_get(char* label, void* key, table t){
 		if(i == t->scheme_size || !(strcmp(label,t->scheme_labels[i]))){
 			break;
 		}
+		i++;
 	}
 	if(i == t->scheme_size)
 		return NULL;
 	for(int j = 0; j < t->data_size; j++){
 		if(t->data[j]->element == i){
-			tuple* rl = malloc(sizeof(tuple));
+			tuple* rl = malloc(sizeof(tuple));//Because we are searching a unique, we will only get one tuple back
 			rl[0] = hash_table_get(t->scheme_type[i],key,t->data[j]);
 			return rl;
 		}
