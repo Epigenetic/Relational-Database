@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
 
 #include "tuple.h"
 #include "generic.h"
@@ -23,39 +25,58 @@ void tuple_free(tuple t){
 	free(t);
 }
 
+int call_vsprintf(char* buffer, char* format, ...);
+
 /*
 * Converts given tuple into string based on given scheme
 */
 char* tuple_string(tuple t, enum type scheme[], int len){
-	char* final_string;
+	char* final_string = (char*)malloc(500);
 	for(int i = 0; i < len; i++){
-		char* to_append;
+		char* to_append = (char*)malloc(100);
 		switch(scheme[i]){
 			case character:
-			if(asprintf(&to_appen,"%c",t->data[i]->c) < 0)
+			if(call_vsprintf(to_append,"%c",t->data[i]->c) < 0)
 				return "Error, make sure scheme and length correspond to given tuple";
 			break;
 			
 			case integer:
-			if(asprintf(&to_appen,"%d",t->data[i]->i) < 0)
+			if(call_vsprintf(to_append,"%d",t->data[i]->i) < 0)
 				return "Error, make sure scheme and length correspond to given tuple";
 			break;
 			
 			case floating:
-			if(asprintf(&to_appen,"%f",t->data[i]->f) < 0)
+			if(call_vsprintf(to_append,"%f",t->data[i]->f) < 0)
 				return "Error, make sure scheme and length correspond to given tuple";
 			break;
 			
 			case string:
-			if(asprintf(&to_appen,"%s",t->data[i]->s) < 0)
+			if(call_vsprintf(to_append,"%s",t->data[i]->s) < 0)
 				return "Error, make sure scheme and length correspond to given tuple";
 			break;
 		}
-		if(i == 0)
-			asprintf(&final_string,"(%s",to_append);
-		else
-			asprintf(&final_string,"%s,%s",final_string,to_append);
+		if(i == 0){
+			strcat(final_string,"(");
+			strcat(final_string,to_append);
+		}else{
+			strcat(final_string,",");
+			strcat(final_string,to_append);
+		}
+		free(to_append);
 	}
-	asprintf(&final_string,"%s)",final_string);
+	strcat(final_string,")");
 	return final_string;
+}
+
+/*
+* Helper function for calling vsprintf
+*/
+int call_vsprintf(char* buffer, char* format, ...){
+	va_list vl;
+	int ret;
+	va_start(vl,format);
+	ret = vsprintf(buffer,format,vl);
+	va_end(vl);
+	
+	return ret;
 }

@@ -33,14 +33,21 @@ int main(){
 	int id[] = {123456};
 	tuple* tu = table_get("Student ID",id,t);
 	//printf("end");
-	printf("ID: %d, Name %s, Address: %s, Phone: %d\n",tu[0]->data[0]->i,tu[0]->data[1]->s,tu[0]->data[2]->s,tu[0]->data[3]->i);
+	char* converted_tuple = tuple_string(tu[0],types,4);
+	printf("%s\n",converted_tuple);
+	free(converted_tuple);
 	tuple_free(tu[0]);
 	free(tu);
 	
 	char* address = "4 Main St.";
 	tuple* tu2 = table_get("Address",address,t);
-	printf("ID: %d, Name %s, Address: %s, Phone: %d\n",tu2[0]->data[0]->i,tu2[0]->data[1]->s,tu2[0]->data[2]->s,tu2[0]->data[3]->i);
-	printf("ID: %d, Name %s, Address: %s, Phone: %d\n",tu2[1]->data[0]->i,tu2[1]->data[1]->s,tu2[1]->data[2]->s,tu2[1]->data[3]->i);
+	converted_tuple = tuple_string(tu2[0],types,4);
+	printf("%s\n",converted_tuple);
+	free(converted_tuple);
+	
+	converted_tuple = tuple_string(tu2[1],types,4);
+	printf("%s\n",converted_tuple);
+	free(converted_tuple);
 	
 	tuple_free(tu2[0]);
 	tuple_free(tu2[1]);
