@@ -91,7 +91,7 @@ void table_insert(int num, table t, ...){
 /*
 * Gets the appropriate tuple from using the appropriate table
 */
-tuple* table_get(char* label, void* key, table t){
+tuple* table_select(char* label, void* key, table t){
 	int i = 0;
 	while(i <= t->scheme_size){
 		if(i == t->scheme_size || !(strcmp(label,t->scheme_labels[i]))){

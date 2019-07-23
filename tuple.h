@@ -25,4 +25,9 @@ void tuple_free(tuple t);
 */
 char* tuple_string(tuple t, enum type scheme[], int len);
 
+/*
+* Prints a given tuple based on given scheme
+*/
+void tuple_print(tuple t, enum type scheme[], int len);
+
 #endif

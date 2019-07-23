@@ -69,6 +69,15 @@ char* tuple_string(tuple t, enum type scheme[], int len){
 }
 
 /*
+* Prints a given tuple based on given scheme
+*/
+void tuple_print(tuple t, enum type scheme[], int len){
+	char* to_print = tuple_string(t,scheme,len);
+	printf("%s\n", to_print);
+	free(to_print);
+}
+
+/*
 * Helper function for calling vsprintf
 */
 int call_vsprintf(char* buffer, char* format, ...){
