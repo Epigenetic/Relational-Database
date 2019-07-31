@@ -31,20 +31,16 @@ int main(){
 	table_insert(4,t,1121,"Charlie Brown","4 Main St.",2083);
 	table_insert(4,t,1151,"John Smith","4 Main St.",2083);
 	int id[] = {123456};
-	tuple* tu = table_select("Student ID",id,t);
+	table t2 = table_select("Student ID",id,t);
 	//printf("end");
-	tuple_print(tu[0],types,4);
-	tuple_free(tu[0]);
-	free(tu);
+	table_print(t2);
+	table_free(t2);
 	
 	char* address = "4 Main St.";
-	tuple* tu2 = table_select("Address",address,t);
-	tuple_print(tu2[0],types,4);
-	tuple_print(tu2[1],types,4);
+	table t3 = table_select("Address",address,t);
+	table_print(t3);
 	
-	tuple_free(tu2[0]);
-	tuple_free(tu2[1]);
-	free(tu2);
+	table_free(t3);
 	table_free(t);
 	free(labels);
 	free(types);

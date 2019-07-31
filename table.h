@@ -20,6 +20,7 @@ struct table{
 	int scheme_size;
 	enum type* scheme_type;
 	char** scheme_labels;
+	char** index_labels;
 };
 
 /*
@@ -43,6 +44,26 @@ void table_insert(int num, table t, ...);
 /*
 * Gets the appropriate tuple(s) from using the appropriate table
 */
-tuple* table_select(char* label, void* key, table t);
+table table_select(char* label, void* key, table t);
+
+/*
+* Projects a table on the given column(s)
+*/
+table table_project(char* label[], table t);
+
+/*
+* Copies a table's scheme into a new one
+*/
+table table_copy_scheme(table t);
+
+/*
+* Inserts a given tuple into the table (assumes tuple is of correct scheme)
+*/
+void table_insert_tuple(tuple tu, table ta);
+
+/*
+* Prints a given table (prints the scheme, the index labels, and all the tuples)
+*/
+void table_print(table t);
 
 #endif
