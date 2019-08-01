@@ -30,6 +30,7 @@ int main(){
 	table_insert(4,t,123456,"George Ferguson","500 Joseph C. Wilson Blvd.",654321);
 	table_insert(4,t,1121,"Charlie Brown","4 Main St.",2083);
 	table_insert(4,t,1151,"John Smith","4 Main St.",2083);
+	/*
 	int id[] = {123456};
 	table t2 = table_select("Student ID",id,t);
 	//printf("end");
@@ -41,10 +42,19 @@ int main(){
 	table_print(t3);
 	
 	table_free(t3);
-	table_free(t);
 	free(labels);
 	free(types);
 	free(is_index);
+	*/
+	
+	char** plabel = (char**)malloc(sizeof(char*)*2);
+	plabel[0] = "Student ID";
+	plabel[1] = "Address";
+	table t4 = table_project(plabel,2,t);
+	free(plabel);
+	table_print(t4);
+	table_free(t4);
+	table_free(t);
 	
 	/*
 	generic g = generic_new();

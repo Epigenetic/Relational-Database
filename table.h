@@ -49,7 +49,7 @@ table table_select(char* label, void* key, table t);
 /*
 * Projects a table on the given column(s)
 */
-table table_project(char* label[], table t);
+table table_project(char* label[], int num, table t);
 
 /*
 * Copies a table's scheme into a new one

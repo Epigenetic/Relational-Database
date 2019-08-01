@@ -14,12 +14,15 @@
 table table_new(int scheme_size, char* scheme_labels[], enum type scheme_type[], int is_index[]){
 	table t = (table)malloc(sizeof(struct table));
 	t->scheme_size = scheme_size;
-	t->scheme_labels = scheme_labels;
-	t->scheme_type = scheme_type;
+	t->scheme_labels = (char**)malloc(sizeof(char*)*scheme_size);
+	t->scheme_type = (enum type*)malloc(sizeof(enum type)*scheme_size);
 	int sum = 0;
-	for(int i = 0; i < scheme_size; i++)
+	for(int i = 0; i < scheme_size; i++){
+		t->scheme_labels[i] = scheme_labels[i];
+		t->scheme_type[i] = scheme_type[i];
 		if(is_index[i] != 0)
 			sum++;
+	}
 	t->data_size = sum;
 	hash_table* data = (hash_table*)malloc(sizeof(hash_table)*sum);
 	char** index_labels = (char**)malloc(sizeof(char*)*sum);
@@ -46,6 +49,8 @@ void table_free(table t){
 		hash_table_free(t->data[i]);
 	free(t->data);
 	free(t->index_labels);
+	free(t->scheme_labels);
+	free(t->scheme_type);
 	free(t);
 }
 
@@ -151,6 +156,70 @@ table table_copy_scheme(table t){
 	table rt = table_new(t->scheme_size, t->scheme_labels, t->scheme_type, is_index);
 	free(is_index);
 	return rt;
+}
+
+/*
+* Projects a table on the given column(s)
+* items indexed in one table will be in the other
+* If none of the columns are indexed, the first will be
+*/
+table table_project(char* label[], int num, table t){
+	int i = 0, found = 0;
+	int* is_index = (int*)malloc(sizeof(int)*t->scheme_size);
+	enum type* types = (enum type*)malloc(sizeof(enum type)*num);
+	int* locations = (int*)malloc(sizeof(int)*num);
+	while(i < t->scheme_size && found < num){
+		if(!strcmp(t->scheme_labels[i],label[found])){
+			types[found] = t->scheme_type[i];
+			locations[found] = i;
+			for(int j = 0; j < t->data_size; j++){
+				if(!strcmp(t->index_labels[j],label[found])){
+					is_index[found] = 1;
+				}else{
+					is_index[found] = 0;
+				}
+			}
+			found++;
+		}
+		i++;
+	}
+	int sum = 0;
+	for(int i = 0; i < num; i++) //See how many indices there are, and if there are none, make the first one an index
+		sum += is_index[i];
+	if(sum == 0)
+		is_index[0] = 1;
+	table t2 = table_new(num, label, types, is_index);
+	for(int i = 0; i < t->data[0]->size; i++){
+		if(t->data[0]->data[i] == NULL)
+			continue;
+		tuple tu = tuple_new(num);
+		for(int j = 0; j < num; j++){
+			generic g = generic_new();
+			switch(types[j]){
+				case character:
+				g->c = t->data[0]->data[i]->data[locations[j]]->c;
+				break;
+				
+				case integer:
+				g->i = t->data[0]->data[i]->data[locations[j]]->i;
+				break;
+				
+				case floating:
+				g->f = t->data[0]->data[i]->data[locations[j]]->f;
+				break;
+				
+				case string:
+				g->s = t->data[0]->data[i]->data[locations[j]]->s;
+				break;
+			}
+			tu->data[j] = g;
+		}
+		table_insert_tuple(tu, t2);
+	}
+	free(is_index);
+	free(types);
+	free(locations);
+	return t2;
 }
 
 /*
