@@ -22,4 +22,19 @@ generic generic_new();
 */
 void generic_free(generic g);
 
+/*
+* Converts a enum type to a string
+*/
+char* type_to_string(enum type t);
+
+/*
+ * Tests equality of two generics holding the same type
+ */
+int generic_equal(generic g1, generic g2, enum type t);
+
+/*
+ * Copies the value of one generic for a given type into another
+ */
+void generic_copy(generic g1, generic g2, enum type t);
+
 #endif

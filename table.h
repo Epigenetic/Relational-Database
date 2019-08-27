@@ -52,6 +52,14 @@ table table_select(char* label, void* key, table t);
 table table_project(char* label[], int num, table t);
 
 /*
+* Joins two tables on the given item(s)
+* Column(s) to join on are given in the label_pairs such that label_pairs[0][0] goes with label_pairs[1][0], [0][1] with [1][1], etc.
+* Label in the new table will be the name of the same item in the first table unless it is not present there (in which case it is the label of the second table)
+* Tuples will have the following scheme: (JoinedItems, t1Items-JoinedItems,t2Items-JoinedItems)
+*/
+table table_join(char*** label_pairs, int num, table t1, table t2);
+
+/*
 * Copies a table's scheme into a new one
 */
 table table_copy_scheme(table t);

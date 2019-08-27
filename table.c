@@ -223,10 +223,158 @@ table table_project(char* label[], int num, table t){
 }
 
 /*
+ * Helper function to test if a given number is in an array
+*/
+int in_array(int* array, int len, int target){
+	for(int i = 0; i<len; i++)
+		if(array[i] == target)
+			return 1;
+	return 0;
+}
+
+/*
+* Joins two tables on the given item(s)
+* Column(s) to join on are given in the label_pairs such that label_pairs[0][0] goes with label_pairs[1][0], [0][1] with [1][1], etc.
+* Label in the new table will be the name of the same item in the first table unless it is not present there (in which case it is the label of the second table)
+* Tuples will have the following scheme: (JoinedItems, t1Items-JoinedItems,t2Items-JoinedItems)
+*/
+table table_join(char*** label_pairs, int num, table t1, table t2){
+	int i1[t1->scheme_size];
+	int i2[t2->scheme_size];
+	
+	//Find where each label is in the schemes
+	for(int i = 0; i < num; i++){
+		for(int j = 0; j < t1->scheme_size; j++){
+			if(!strcmp(label_pairs[0][i],t1->scheme_labels[j])){
+				i1[i] = j;
+				break;
+			}
+		}
+	}
+	int fill = num;
+	//Fill in the non joined cases
+	for(int i = 0; i < t1->scheme_size; i++){
+		if(in_array(i1,t1->scheme_size,i))
+			continue;
+		i1[fill++] = i;
+	}
+	for(int i = 0; i < num; i++){
+		for(int j = 0; j < t2->scheme_size; j++){
+			if(!strcmp(label_pairs[1][i],t2->scheme_labels[j])){
+				i2[i] = j;
+				break;
+			}
+		}
+	}
+	fill = num;
+	for(int i = 0; i < t2->scheme_size; i++){
+		if(in_array(i2,t2->scheme_size,i))
+			continue;
+		i2[fill++] = i;
+	}
+	
+	int len = t1->scheme_size + t2->scheme_size - num;
+	char** labels = (char**)malloc(sizeof(char*)*len);
+	enum type* types = (enum type*)malloc(sizeof(enum type)*len);
+	
+	for(int i = 0; i < num; i++){
+		if(t1->scheme_type[i1[i]] != t2->scheme_type[i2[i]]){
+			printf("Label %s and %s are not of incompatible types %s and %s",label_pairs[0][i],label_pairs[0][i],
+				type_to_string(t1->scheme_type[i1[i]]), type_to_string(t2->scheme_type[i2[i]]));
+			return NULL;
+		}
+		types[i] = t1->scheme_type[i1[i]];
+		labels[i] = t1->scheme_labels[i1[i]]; //fill in the shared labels while we are checking for type compatibility
+	}
+	
+	int found = 0;
+	fill = num;
+	for(int i = 0; i < t1->scheme_size; i++){
+		if(found < num && i1[found] == i){//NEED TO DO AWAY WITH THIS, CHECK FOR ALREADY FILLED VALUES SOME OTHER WAY, DECLARE FOUND EARLIER?
+			found++;
+			continue;
+		}
+		types[fill] = t1->scheme_type[i];
+		labels[fill] = t1->scheme_labels[i];
+		fill++;
+	}
+	
+	found = 0;
+	for(int i = 0; i < t2->scheme_size; i++){
+		if(found < num && i2[found] == i){
+			found++;
+			continue;
+		}
+		types[fill] = t2->scheme_type[i];
+		labels[fill] = t2->scheme_labels[i];
+		fill++;
+	}
+	
+	int* is_index = (int*)malloc(sizeof(int)*len);
+	
+	// Identify the indices in the new table
+	for(int i = 0; i < len; i++){
+		for(int j = 0; j < t1->data_size; j++){
+			if(!strcmp(labels[i],t1->index_labels[j]))
+				is_index[j] |= 1;
+			else
+				is_index[j] |= 0;
+		}
+		for(int j = 0; j < t2->data_size; j++){
+			if(!strcmp(labels[i],t2->index_labels[j]))
+				is_index[j] |= 1;
+			else
+				is_index[j] |= 0;
+		}
+	}
+	
+	//Check for at least one index, if there is none, the first item becomes one
+	int sum;
+	for(int i = 0; i < len; i++)
+		sum += is_index[i];
+	if(sum == 0)
+		is_index[0] = 1;
+	
+	table rt = table_new(len, labels, types, is_index);
+	
+	for(int i = 0; i < t1->data[0]->size; i++){
+		for(int j = 0; j < t2->data[0]->size; j++){
+			if(t1->data[0]->data[i] == NULL || t2->data[0]->data[j] == NULL)
+				continue;
+			int break_flag = 0;
+			for(int k = 0; k < num; k++){
+				//If any of the paired itmes are not equal, do not merge them and add them
+				break_flag = !generic_equal(t1->data[0]->data[i]->data[i1[k]],t2->data[0]->data[j]->data[i2[k]],types[k]);
+				if(break_flag) //If one item is not equal, stop checking if the rest are
+					break;
+			}
+			if(break_flag) //If they are not equal, go to next tuple
+				continue;
+			
+			tuple tu = tuple_new(len);
+			for(int k = 0; k < len; k++){
+				generic to_copy;
+				if(k < t1->scheme_size){
+					to_copy = t1->data[0]->data[i]->data[i1[k]];
+				}else{//Would be l < len, but this will always be true
+					to_copy = t2->data[0]->data[j]->data[i2[k-(t1->scheme_size-1)]];
+				}
+				generic new = generic_new();
+				generic_copy(to_copy, new, types[k]);
+				tu->data[k] = new;
+			}
+			
+			table_insert_tuple(tu,rt);
+		}
+	}
+	return rt;
+}
+
+/*
 * Prints a given table (prints the scheme, the index labels, and all the tuples)
 */
 void table_print(table t){
-	printf("scheme labels: (");
+	printf("Scheme Labels: (");
 	for(int i = 0; i < t->scheme_size; i++){
 		if(i + 1 == t->scheme_size)
 			printf("%s", t->scheme_labels[i]);
@@ -234,40 +382,15 @@ void table_print(table t){
 			printf("%s, ", t->scheme_labels[i]);
 	}
 	
-	printf(")\nscheme types: (");
+	printf(")\nScheme Types: (");
 	for(int i = 0; i < t->scheme_size; i++){
-		switch(t->scheme_type[i]){
-			case character:
-			if(i + 1 == t->scheme_size)
-				printf("character");
-			else
-				printf("character, ");
-			break;
-			
-			case integer:
-			if(i + 1 == t->scheme_size)
-				printf("integer");
-			else
-				printf("integer, ");
-			break;
-			
-			case floating:
-			if(i + 1 == t->scheme_size)
-				printf("floating");
-			else
-				printf("floating, ");
-			break;
-			
-			case string:
-			if(i + 1 == t->scheme_size)
-				printf("string");
-			else
-				printf("string, ");
-			break;
-		}
+		if(i+1 == t->scheme_size)
+			printf("%s",type_to_string(t->scheme_type[i]));
+		else
+			printf("%s, ",type_to_string(t->scheme_type[i]));
 	}
 	
-	printf(")\nindex labels: (");
+	printf(")\nIndex Labels: (");
 	for(int i = 0; i < t->data_size; i++){
 		if(i+1 == t->data_size)
 			printf("%s", t->index_labels[i]);
