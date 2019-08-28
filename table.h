@@ -74,4 +74,15 @@ void table_insert_tuple(tuple tu, table ta);
 */
 void table_print(table t);
 
+/*
+* Stores a table into a file
+*/
+void table_out(table t, char* file_name);
+
+/*
+* Reads a table from a file
+* Expects format produced by table_out
+*/
+table table_in(char* file_name);
+
 #endif

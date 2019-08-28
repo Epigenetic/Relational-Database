@@ -29,6 +29,7 @@ int call_vsprintf(char* buffer, char* format, ...);
 
 /*
 * Converts given tuple into string based on given scheme
+* The string is malloc'd, so make sure you free it!
 */
 char* tuple_string(tuple t, enum type scheme[], int len){
 	char* final_string = (char*)malloc(500);

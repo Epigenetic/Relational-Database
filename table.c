@@ -45,7 +45,8 @@ table table_new(int scheme_size, char* scheme_labels[], enum type scheme_type[],
 * Frees the given table
 */
 void table_free(table t){
-	for(int i = 0; i < t->data_size; i++)
+	hash_table_free_complete(t->data[0]);
+	for(int i = 1; i < t->data_size; i++)
 		hash_table_free(t->data[i]);
 	free(t->data);
 	free(t->index_labels);
@@ -367,6 +368,9 @@ table table_join(char*** label_pairs, int num, table t1, table t2){
 			table_insert_tuple(tu,rt);
 		}
 	}
+	free(labels);
+	free(types);
+	free(is_index);
 	return rt;
 }
 
@@ -406,4 +410,62 @@ void table_print(table t){
 		if(found == t->data[0]->fill) //If we have found all the tuples before going through every item, stop
 			break;
 	}
+}
+
+/*
+* Stores a table into a file
+* Format is:
+* First line has scheme size
+* Second line has list of scheme labels
+* Third line has list of scheme types
+* Fourth line has ist of is_index values
+* All remaining lines are tuples in the table
+*/
+void table_out(table t, char* file_name){
+	FILE* out = fopen(file_name,"w");
+	
+	fprintf(out, "%d\n", t->scheme_size);
+	
+	for(int i = 0; i < t->scheme_size; i++){
+		if(i + 1 == t->scheme_size)
+			fprintf(out, "%s", t->scheme_labels[i]);
+		else
+			fprintf(out, "%s, ", t->scheme_labels[i]);
+	}
+	
+	fputs("\n", out);
+	
+	for(int i = 0; i < t->scheme_size; i++){
+		if(i+1 == t->scheme_size)
+			fprintf(out, "%s",type_to_string(t->scheme_type[i]));
+		else
+			fprintf(out, "%s, ",type_to_string(t->scheme_type[i]));
+	}
+	
+	fputs("\n", out);
+	
+	for(int i = 0; i < t->scheme_size; i++){
+		int is_index = 0;
+		for(int j = 0; j < t->data_size; j++){
+			if(!strcmp(t->scheme_labels[i],t->index_labels[j])){
+				is_index = 1;
+				break;
+			}
+		}
+		if(i+1 == t->scheme_size)
+			fprintf(out, "%d", is_index);
+		else
+			fprintf(out, "%d, ", is_index);
+	}
+	
+	fputs("\n", out);
+	
+	for(int i = 0; i < t->data[0]->size; i++)
+		if(t->data[0]->data[i] != NULL){
+			char* tuple  = tuple_string(t->data[0]->data[i], t->scheme_type, t->scheme_size);
+			fprintf(out, "%s\n", tuple);
+			free(tuple);
+		}
+	
+	fclose(out);
 }

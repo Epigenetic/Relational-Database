@@ -79,11 +79,19 @@ int main(){
 	pairs[1] = p2;
 	table t6 = table_join(pairs, 1,t,t5);
 	table_print(t6);
+	table_out(t6, "out.txt");
+	table_free(t5);
 	table_free(t6);
 	table_free(t);
 	free(p1);
 	free(p2);
 	free(pairs);
+	free(labels);
+	free(types);
+	free(is_index);
+	free(labels2);
+	free(types2);
+	free(is_index2);
 	
 	/*
 	generic g = generic_new();

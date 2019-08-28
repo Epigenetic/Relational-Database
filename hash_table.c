@@ -53,6 +53,24 @@ void hash_table_free(hash_table h){
 	free(h);
 }
 
+/*
+* Frees a hash table and the tuples in it
+*/
+void hash_table_free_complete(hash_table h){
+	int found = 0;
+	for(int i = 0; i < h->size; i++){
+		if(h->data[i] != NULL){
+			tuple_free(h->data[i]);
+			found++;
+		}
+		if(found == h->fill)
+			break;
+	}
+	
+	free(h->data);
+	free(h);
+}
+
 tuple* increase_size(hash_table h){
 	tuple* d = (tuple*)malloc(sizeof(tuple)*h->size*2);
 	for(int i = 0; i < h->size*2;i++)

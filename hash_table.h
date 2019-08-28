@@ -32,6 +32,11 @@ hash_table hash_table_new(int n, int e, enum type index);
 void hash_table_free(hash_table h);
 
 /*
+* Frees a hash table and the tuples in it
+*/
+void hash_table_free_complete(hash_table h);
+
+/*
 * Inserts a new tuple into the hash table
 */
 void hash_table_insert(tuple t, hash_table h);
