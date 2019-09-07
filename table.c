@@ -378,6 +378,7 @@ table table_join(char*** label_pairs, int num, table t1, table t2){
 * Prints a given table (prints the scheme, the index labels, and all the tuples)
 */
 void table_print(table t){
+	//printf("Fill: %d\n", t->data[0]->fill);
 	printf("Scheme Labels: (");
 	for(int i = 0; i < t->scheme_size; i++){
 		if(i + 1 == t->scheme_size)
@@ -404,8 +405,11 @@ void table_print(table t){
 	printf(")\n");
 	int found = 0;
 	for(int i = 0; i < t->data[0]->size; i++){
-		if(t->data[0]->data[i] != NULL)
+		if(t->data[0]->data[i] != NULL){
 			tuple_print(t->data[0]->data[i], t->scheme_type, t->scheme_size);
+			found++;
+			//printf("Print %d\n", i);
+		}
 		
 		if(found == t->data[0]->fill) //If we have found all the tuples before going through every item, stop
 			break;

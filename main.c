@@ -78,6 +78,10 @@ int main(){
 	pairs[0] = p1;
 	pairs[1] = p2;
 	table t6 = table_join(pairs, 1,t,t5);
+	table_print(t);
+	printf("\n");
+	table_print(t5);
+	printf("\n");
 	table_print(t6);
 	table_out(t6, "out.txt");
 	table_free(t5);

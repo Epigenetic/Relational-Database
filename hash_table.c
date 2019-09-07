@@ -227,9 +227,9 @@ int float_hash(generic f, int n){
 int string_hash(generic s, int n){
 	//printf("entered");
 	char* s_ = s->s;
-	int sum;
+	unsigned int sum;
 	for(int i = 0; i < 3; i++){
-		sum += s_[i];
+		sum += (unsigned char)s_[i];
 		if(s_[i] == '\0')
 			break;
 	}
