@@ -13,19 +13,24 @@ union generic{
 };
 
 /*
-* Returns a new generic
-*/
+ * Returns a new generic
+ */
 generic generic_new();
 
 /*
-* Frees the given generic
-*/
+ * Frees the given generic
+ */
 void generic_free(generic g);
 
 /*
-* Converts a enum type to a string
-*/
+ * Converts an enum type to a string
+ */
 char* type_to_string(enum type t);
+
+/*
+ * Converts a string to an enum type
+ */
+enum type string_to_type(const char* s);
 
 /*
  * Tests equality of two generics holding the same type

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -14,6 +15,8 @@ generic generic_new(){
 * Frees the given generic
 */
 void generic_free(generic g){
+	if(g == NULL)
+		return;
 	free(g);
 }
 
@@ -35,6 +38,24 @@ char* type_to_string(enum type t){
 		return "String";
 	}
 	return "Not a type";
+}
+
+/*
+ * Converts a string to an enum type
+ */
+enum type string_to_type(const char* s){
+	if(!strcmp(s,"Character")){
+		return character;
+	}else if(!strcmp(s,"Integer")){
+		return integer;
+	}else if(!strcmp(s,"Floating")){
+		return floating;
+	}else if(!strcmp(s, "String")){
+		return string;
+	}else{
+		printf("Illegal type %s", s);
+		return -1;
+	}
 }
 
 /*

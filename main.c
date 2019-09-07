@@ -83,7 +83,11 @@ int main(){
 	table_print(t5);
 	printf("\n");
 	table_print(t6);
+	printf("\n");
 	table_out(t6, "out.txt");
+	table t7 = table_in("out.txt");
+	table_print(t7);
+	table_free(t7);
 	table_free(t5);
 	table_free(t6);
 	table_free(t);

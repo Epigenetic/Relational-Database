@@ -434,7 +434,7 @@ void table_out(table t, char* file_name){
 		if(i + 1 == t->scheme_size)
 			fprintf(out, "%s", t->scheme_labels[i]);
 		else
-			fprintf(out, "%s, ", t->scheme_labels[i]);
+			fprintf(out, "%s,", t->scheme_labels[i]);
 	}
 	
 	fputs("\n", out);
@@ -443,7 +443,7 @@ void table_out(table t, char* file_name){
 		if(i+1 == t->scheme_size)
 			fprintf(out, "%s",type_to_string(t->scheme_type[i]));
 		else
-			fprintf(out, "%s, ",type_to_string(t->scheme_type[i]));
+			fprintf(out, "%s,",type_to_string(t->scheme_type[i]));
 	}
 	
 	fputs("\n", out);
@@ -459,7 +459,7 @@ void table_out(table t, char* file_name){
 		if(i+1 == t->scheme_size)
 			fprintf(out, "%d", is_index);
 		else
-			fprintf(out, "%d, ", is_index);
+			fprintf(out, "%d,", is_index);
 	}
 	
 	fputs("\n", out);
@@ -472,4 +472,113 @@ void table_out(table t, char* file_name){
 		}
 	
 	fclose(out);
+}
+
+/*
+* Reads a table from a file
+* Expects format produced by table_out
+*/
+table table_in(char* file_name){
+	FILE* in = fopen(file_name,"r");
+	char* buffer = malloc(sizeof(char)*1000);
+	
+	fgets(buffer,1000,in);
+	//printf("%s\n",buffer);
+	
+	int scheme_size = buffer[0] - '0';
+	
+	fgets(buffer, 1000, in);
+	buffer[strchr(buffer,'\n')-buffer] = '\0';
+	//printf("%s\n",buffer);
+	
+	char** scheme_labels = malloc(sizeof(char*)*scheme_size);
+	char* token = strtok(buffer, ",");
+	for(int i = 0; i < scheme_size; i++){
+		if(token == NULL){
+			printf("Improperly formatted file, only found %d scheme labels", i);
+			return NULL;
+		}
+		char* tsave = malloc(sizeof(char)*strlen(token)+1);
+		strcpy(tsave, token);
+		scheme_labels[i] = tsave;
+		token = strtok(NULL, ",");
+	}
+	
+	fgets(buffer,1000,in);
+	buffer[strchr(buffer,'\n')-buffer] = '\0';
+	//printf("%s\n",buffer);
+	
+	enum type* scheme_types = malloc(sizeof(enum type)*scheme_size);
+	token = strtok(buffer, ",");
+	for(int i = 0; i < scheme_size; i++){
+		if(token == NULL){
+			printf("Improperly formatted file, only found %d scheme types", i);
+			return NULL;
+		}
+		scheme_types[i] = string_to_type(token);
+		token = strtok(NULL, ",");
+	}
+	
+	fgets(buffer,1000,in);
+	buffer[strchr(buffer,'\n')-buffer] = '\0';
+	//printf("%s\n",buffer);
+	
+	int* is_index = malloc(sizeof(int)*scheme_size);
+	token = strtok(buffer, ",");
+	for(int i = 0; i < scheme_size; i++){
+		if(token == NULL){
+			printf("Improperly formatted file, only found %d indices", i);
+			return NULL;
+		}
+		is_index[i] = token[0] - '0';
+		token = strtok(NULL, ",");
+	}
+	
+	table t = table_new(scheme_size, scheme_labels, scheme_types, is_index);
+	
+	while(fgets(buffer,1000,in) != NULL){
+		buffer[strchr(buffer,'\n')-buffer] = '\0';
+		buffer[strlen(buffer)-1] = '\0'; //remove the )
+		token = strtok(buffer+1, ",");
+		tuple tu = tuple_new(scheme_size);
+		for(int i = 0; i < scheme_size; i++){
+			if(token == NULL){
+				printf("Improperly formatted file, only found %d items in the tuple", i);
+				tuple_free(tu);
+				return NULL;
+			}
+			generic g = generic_new();
+			//printf("Token: %s\n", token);
+			switch(scheme_types[i]){
+				case character:
+				g->c = token[0] - '\0';
+				break;
+				
+				case integer:
+				g->i = atoi(token);
+				break;
+				
+				case floating:
+				g->f = atof(token);
+				break;
+				
+				case string:
+				;
+				char* tsave = malloc(sizeof(char)*strlen(token)+1);
+				strcpy(tsave, token);
+				g->s = tsave;
+				break;
+			}
+			tu->data[i] = g;
+			token = strtok(NULL,",");
+		}
+		table_insert_tuple(tu, t);
+	}
+	
+	fclose(in);
+	free(buffer);
+	free(scheme_labels);
+	free(scheme_types);
+	free(is_index);
+	return t;
 }
