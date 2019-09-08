@@ -34,7 +34,7 @@ void hash_table_free(hash_table h);
 /*
 * Frees a hash table and the tuples in it
 */
-void hash_table_free_complete(hash_table h);
+void hash_table_free_complete(hash_table h, enum type scheme[]);
 
 /*
 * Inserts a new tuple into the hash table

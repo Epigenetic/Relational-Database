@@ -16,9 +16,9 @@ struct tuple{
 tuple tuple_new(int size);
 
 /*
-* Frees the given tuple
+* Frees the given tuple, scheme is required so as to free strings as needed
 */
-void tuple_free(tuple t);
+void tuple_free(tuple t, enum type scheme[]);
 
 /*
 * Converts given tuple into string based on given scheme

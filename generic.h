@@ -23,6 +23,11 @@ generic generic_new();
 void generic_free(generic g);
 
 /*
+ * Frees a given generic and its string
+ */
+void generic_free_string(generic g);
+
+/*
  * Converts an enum type to a string
  */
 char* type_to_string(enum type t);

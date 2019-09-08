@@ -56,11 +56,11 @@ void hash_table_free(hash_table h){
 /*
 * Frees a hash table and the tuples in it
 */
-void hash_table_free_complete(hash_table h){
+void hash_table_free_complete(hash_table h, enum type scheme[]){
 	int found = 0;
 	for(int i = 0; i < h->size; i++){
 		if(h->data[i] != NULL){
-			tuple_free(h->data[i]);
+			tuple_free(h->data[i], scheme);
 			found++;
 		}
 		if(found == h->fill)

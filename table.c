@@ -45,7 +45,7 @@ table table_new(int scheme_size, char* scheme_labels[], enum type scheme_type[],
 * Frees the given table
 */
 void table_free(table t){
-	hash_table_free_complete(t->data[0]);
+	hash_table_free_complete(t->data[0],t->scheme_type);
 	for(int i = 1; i < t->data_size; i++)
 		hash_table_free(t->data[i]);
 	free(t->data);
@@ -96,7 +96,11 @@ void table_insert(int num, table t, ...){
 			break;
 			
 			case string:
-			g->s = va_arg(args,char*);
+			;
+			char* s = va_arg(args,char*);
+			char* s_ = malloc(sizeof(char)*strlen(s)+1);
+			strcpy(s_,s);
+			g->s = s_;
 			break;
 		}
 		tu->data[i] = g;
@@ -210,7 +214,11 @@ table table_project(char* label[], int num, table t){
 				break;
 				
 				case string:
-				g->s = t->data[0]->data[i]->data[locations[j]]->s;
+				;
+				char* s = t->data[0]->data[i]->data[locations[j]]->s;
+				char* s_ = malloc(sizeof(char)*strlen(s)+1);
+				strcpy(s_,s);
+				g->s = s_;
 				break;
 			}
 			tu->data[j] = g;
@@ -241,7 +249,11 @@ int in_array(int* array, int len, int target){
 */
 table table_join(char*** label_pairs, int num, table t1, table t2){
 	int i1[t1->scheme_size];
+	for(int i = 0; i < t1->scheme_size; i++)
+		i1[i] =0;
 	int i2[t2->scheme_size];
+	for(int i = 0; i < t2->scheme_size; i++)
+		i2[i] =0;
 	
 	//Find where each label is in the schemes
 	for(int i = 0; i < num; i++){
@@ -291,7 +303,7 @@ table table_join(char*** label_pairs, int num, table t1, table t2){
 	int found = 0;
 	fill = num;
 	for(int i = 0; i < t1->scheme_size; i++){
-		if(found < num && i1[found] == i){//NEED TO DO AWAY WITH THIS, CHECK FOR ALREADY FILLED VALUES SOME OTHER WAY, DECLARE FOUND EARLIER?
+		if(found < num && i1[found] == i){//Ommit overlap
 			found++;
 			continue;
 		}
@@ -355,13 +367,16 @@ table table_join(char*** label_pairs, int num, table t1, table t2){
 			tuple tu = tuple_new(len);
 			for(int k = 0; k < len; k++){
 				generic to_copy;
+				enum type type;
 				if(k < t1->scheme_size){
 					to_copy = t1->data[0]->data[i]->data[i1[k]];
+					type = types[i1[k]];
 				}else{//Would be l < len, but this will always be true
 					to_copy = t2->data[0]->data[j]->data[i2[k-(t1->scheme_size-1)]];
+					type = types[i2[k-(t1->scheme_size-1)] + t1->scheme_size-1];
 				}
 				generic new = generic_new();
-				generic_copy(to_copy, new, types[k]);
+				generic_copy(to_copy, new, type);
 				tu->data[k] = new;
 			}
 			
@@ -544,7 +559,7 @@ table table_in(char* file_name){
 		for(int i = 0; i < scheme_size; i++){
 			if(token == NULL){
 				printf("Improperly formatted file, only found %d items in the tuple", i);
-				tuple_free(tu);
+				tuple_free(tu, scheme_types);
 				return NULL;
 			}
 			generic g = generic_new();

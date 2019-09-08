@@ -20,6 +20,13 @@ void generic_free(generic g){
 	free(g);
 }
 
+void generic_free_string(generic g){
+	if(g == NULL)
+		return;
+	free(g->s);
+	free(g);
+}
+
 /*
 * Converts a enum type to a string
 */
@@ -96,7 +103,11 @@ void generic_copy(generic g1, generic g2, enum type t){
 		return;
 		
 		case string:
-		g2->s = g1->s;
+		;
+		char* s = g1->s;
+		char* s_ = malloc(sizeof(char)*strlen(s)+1);
+		strcpy(s_,s);
+		g2->s = s_;
 		return;
 	}
 }

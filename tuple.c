@@ -18,9 +18,12 @@ tuple tuple_new(int size){
 /*
 * Frees the given tuple
 */
-void tuple_free(tuple t){
+void tuple_free(tuple t,  enum type scheme[]){
 	for(int i = 0; i < t->size; i++){
-		generic_free(t->data[i]);
+		if(scheme[i] == string)
+			generic_free_string(t->data[i]);
+		else
+			generic_free(t->data[i]);
 	}
 	free(t);
 }
