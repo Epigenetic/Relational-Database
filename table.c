@@ -18,7 +18,9 @@ table table_new(int scheme_size, char* scheme_labels[], enum type scheme_type[],
 	t->scheme_type = (enum type*)malloc(sizeof(enum type)*scheme_size);
 	int sum = 0;
 	for(int i = 0; i < scheme_size; i++){
-		t->scheme_labels[i] = scheme_labels[i];
+		char* label = malloc(sizeof(char)*strlen(scheme_labels[i])+1);
+		strcpy(label,scheme_labels[i]);
+		t->scheme_labels[i] = label;
 		t->scheme_type[i] = scheme_type[i];
 		if(is_index[i] != 0)
 			sum++;
@@ -48,6 +50,8 @@ void table_free(table t){
 	hash_table_free_complete(t->data[0],t->scheme_type);
 	for(int i = 1; i < t->data_size; i++)
 		hash_table_free(t->data[i]);
+	for(int i = 0; i < t->scheme_size; i++)
+		free(t->scheme_labels[i]);
 	free(t->data);
 	free(t->index_labels);
 	free(t->scheme_labels);
@@ -591,6 +595,8 @@ table table_in(char* file_name){
 	}
 	
 	fclose(in);
+	for(int i = 0; i < scheme_size; i++)
+		free(scheme_labels[i]);
 	free(buffer);
 	free(scheme_labels);
 	free(scheme_types);
