@@ -7,9 +7,9 @@ enum token_type {select, from, where, insert, into, values, identifier, comma, l
 
 struct token{
 	enum token_type type;
-	char* content
-	struct token* next;
-	struct token* prev;
+	char* content;
+	token next;
+	token prev;
 };
 
 /*
@@ -27,4 +27,4 @@ void token_free();
  */
 token tokenize(char* input);
 
-#endif _parser_h
+#endif

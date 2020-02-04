@@ -48,28 +48,26 @@ token tokenize(char* input){
 		
 		new->content = t;
 		if(!strcmp(t,"select")){
-			t->type = select;
+			new->type = select;
 		}else if(!strcmp(t, "from")){
-			t->type = from;
+			new->type = from;
 		}else if(!strcmp(t, "where")){
-			t->type = where;
+			new->type = where;
 		}else if(!strcmp(t, "insert")){
-			t->type = insert;
+			new->type = insert;
 		}else if(!strcmp(t, "into")){
-			t->type = into;
+			new->type = into;
 		}else if(!strcmp(t, "values")){
-			t->type = values;
+			new->type = values;
 		}else if(!strcmp(t, ",")){
-			t->type = comma;
+			new->type = comma;
 		}else if(!strcmp(t, "(")){
-			t->type = lparen;
+			new->type = lparen;
 		}else if(!strcmp(t, ")")){
-			t->type = rparen;
+			new->type = rparen;
 		}else{
-			t->type = identifier;
+			new->type = identifier;
 		}
 	}
 	return head;
 }
-
-from,where,insert,into,values,identifier,comma
