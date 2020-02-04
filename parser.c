@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -26,6 +27,8 @@ void token_free(){
  * Tokenize given command, returns head of list
  */
 token tokenize(char* input){
+	
+	*strrchr(input,'\n') = '\0';
 	
 	//all strings processed case insensitive
 	for(int i = 0; input[i]; i++)
@@ -65,9 +68,13 @@ token tokenize(char* input){
 			new->type = lparen;
 		}else if(!strcmp(t, ")")){
 			new->type = rparen;
+		}else if(!strcmp(t,"'")){
+			new->type = quote;
 		}else{
 			new->type = identifier;
 		}
+		//printf("token made: %s\n",new->content);
+		t = strtok(NULL," ");
 	}
 	return head;
 }

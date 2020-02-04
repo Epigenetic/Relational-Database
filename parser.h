@@ -3,7 +3,7 @@
 
 typedef struct token* token;
 
-enum token_type {select, from, where, insert, into, values, identifier, comma, lparen, rparen};
+enum token_type {select, from, where, insert, into, values, identifier, comma, lparen, rparen, quote};
 
 struct token{
 	enum token_type type;

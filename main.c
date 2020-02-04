@@ -1,13 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "tuple.h"
 #include "generic.h"
 #include "table.h"
 #include "hash_table.h"
+#include "parser.h"
 
 int main(int argc, char** argv){
-	
+	char cmd[2048];
+	fgets(cmd,2048,stdin);
+	while(strcmp(cmd,"\\q\n")){
+		token t = tokenize(cmd);
+		while(t != NULL){
+			printf("Content: %s, Type: %d\n",t->content,t->type);
+			t = t->next;
+		}
+		
+		fgets(cmd,2048,stdin);
+	}
 	
 	/*
 	//printf("start\n");
