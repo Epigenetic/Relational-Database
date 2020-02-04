@@ -6,7 +6,10 @@
 #include "table.h"
 #include "hash_table.h"
 
-int main(){
+int main(int argc, char** argv){
+	
+	
+	/*
 	//printf("start\n");
 	char **labels = (char**)malloc(sizeof(char*)*4);
 	labels[0] = "Student ID";
@@ -30,7 +33,7 @@ int main(){
 	table_insert(4,t,123456,"George Ferguson","500 Joseph C. Wilson Blvd.",654321);
 	table_insert(4,t,1121,"Charlie Brown","4 Main St.",2083);
 	table_insert(4,t,1151,"John Smith","4 Main St.",2083);
-	/*
+	
 	int id[] = {123456};
 	table t2 = table_select("Student ID",id,t);
 	//printf("end");
@@ -55,7 +58,7 @@ int main(){
 	free(plabel);
 	table_print(t4);
 	table_free(t4);
-	*/
+
 	
 	char** labels2 = (char**)malloc(sizeof(char*)*2);
 	labels2[0] = "ID";
@@ -101,7 +104,7 @@ int main(){
 	free(types2);
 	free(is_index2);
 	
-	/*
+
 	generic g = generic_new();
 	generic_free(g);
 	*/
