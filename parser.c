@@ -19,8 +19,10 @@ token token_new(){
 /*
  * Free a token
  */
-void token_free(){
-	
+void token_free(token t){
+	if(t->next)
+		token_free(t->next);
+	free(t);
 }
 
 /*
@@ -78,3 +80,35 @@ token tokenize(char* input){
 	}
 	return head;
 }
+
+/*
+ * Return a new node
+ */
+node node_new(){
+	node n = (node)malloc(sizeof(struct node));
+	n->parent = NULL;
+	n->child = NULL;
+	n->sibling = NULL;
+	return n;
+}
+
+/*
+ * Free a node
+ */
+ void node_free(node n){
+	 if(n->child)
+		 node_free(n->child);
+	 if(n->sibling)
+		 node_free(n->child);
+	 free(n);
+ }
+ 
+/*
+ * Parses command into parse tree given head of list of tokens
+ * Returns root of tree
+ */
+ node parse(token t){
+	 
+	 return null;
+ }
+

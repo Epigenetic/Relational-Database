@@ -13,10 +13,6 @@ int main(int argc, char** argv){
 	fgets(cmd,2048,stdin);
 	while(strcmp(cmd,"\\q\n")){
 		token t = tokenize(cmd);
-		while(t != NULL){
-			printf("Content: %s, Type: %d\n",t->content,t->type);
-			t = t->next;
-		}
 		
 		fgets(cmd,2048,stdin);
 	}
