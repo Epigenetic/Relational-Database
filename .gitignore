@@ -1,0 +1,4 @@
+*.o
+data
+Session
+out.txt
