@@ -13,6 +13,8 @@ int main(int argc, char** argv){
 	fgets(cmd,2048,stdin);
 	while(strcmp(cmd,"\\q\n")){
 		token t = tokenize(cmd);
+		node n = parse(t);
+		printf("%ld\n",sizeof(n));//temporary to get rid of error about unused variable
 		
 		fgets(cmd,2048,stdin);
 	}

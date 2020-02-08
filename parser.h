@@ -4,8 +4,8 @@
 typedef struct token* token;
 typedef struct node* node;
 
-enum token_type {select, from, where, insert, into, values, identifier, comma, lparen, rparen, quote};
-enum node_type {statement, tuple, list};
+enum token_type {select, from, where, insert, into, values, identifier, comma, lparen, rparen, quote,equal};
+enum node_type {insert_statement, select_statement, tupl, list, leaf,equality};
 
 struct token{
 	enum token_type type;
@@ -15,9 +15,9 @@ struct token{
 };
 
 struct node{
-	node parent;
 	node child; //parse tree is in left child, right sibling format
 	node sibling;
+	token content;
 	enum node_type type;
 };
 
