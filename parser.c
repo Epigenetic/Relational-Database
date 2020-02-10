@@ -200,10 +200,11 @@ token lis;
 	 node tu = node_new();
 	 tu->type = equality;
 	 wh->sibling = tu;
-	 if(!parse_equal(tu)){
+	 if(!parse_equal(tu) || lis){ //finished parsing but some tokens not processed
 		 node_free(nn);
 		 return NULL;
 	 }
+	 
 	 return nn;
  }
  
@@ -212,10 +213,80 @@ token lis;
  }
  
  node parse_list(node n){
-	 return NULL;
+	 if(lis->type != identifier)
+		 return NULL;
+	 
+	 node lh = node_new();
+	 lh->type = leaf;
+	 lh->content = lis;
+	 n->child = lh;
+	 lis = lis->next;
+	 if(!lis) //unexpected end of token stream
+		return NULL;
+	 
+	 node lhn;
+	 
+	 while(1){ //continue processing list until it ends
+		if(lis->type != identifier)
+			return NULL;
+	 
+		lhn = node_new();
+		lhn->type = leaf;
+		lhn->content = lis;
+		lh->sibling = lhn;
+		lh = lhn;
+		lis = lis->next;
+		if(!lis)//unexpected end of token stream
+			return NULL;
+		
+		if(lis->type != comma) //end of list
+			break;
+	 
+		lhn = node_new();
+		lhn->type = leaf;
+		lhn->content = lis;
+		lh->sibling = lhn;
+		lh = lhn;
+		lis = lis->next;
+		if(!lis) //unexpected end of token stream
+			return NULL;
+	 }
+	 
+	 return n;
  }
  
  node parse_equal(node n){
-	 return NULL;
+	 if(lis->type != identifier)
+		 return NULL;
+	 
+	 node left = node_new();
+	 left->type = leaf;
+	 left->content = lis;
+	 n->child = left;
+	 lis = lis->next;
+	 if(!lis) //unexpected end of token stream
+		return NULL;
+	 
+	 if(lis->type != equal)
+		 return NULL;
+	 
+	 node eq = node_new();
+	 eq->type = leaf;
+	 eq->content = lis;
+	 left->sibling = eq;
+	 lis = lis->next;
+	 if(!lis) //unexpected end of token stream
+		return NULL;
+		
+	 if(lis->type != identifier)
+		return NULL;
+	 
+	 node right = node_new();
+	 right->type = leaf;
+	 right->content = lis;
+	 eq->sibling = right;
+	 lis = lis->next;
+	 
+	 return left;
  }
 
